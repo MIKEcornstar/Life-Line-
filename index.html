@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Be My Valentine</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: radial-gradient(circle at top, #ffd6e8 0%, #ff9ec4 35%, #ff6b81 100%);
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* Watercolor rose background */
+    .rose-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.45;
+        background:
+            radial-gradient(circle at 20% 30%, rgba(255,182,193,0.55) 0, transparent 55%),
+            radial-gradient(circle at 80% 40%, rgba(255,105,135,0.45) 0, transparent 55%),
+            radial-gradient(circle at 30% 80%, rgba(255,160,180,0.45) 0, transparent 55%),
+            radial-gradient(circle at 70% 75%, rgba(220,20,60,0.35) 0, transparent 60%);
+        filter: blur(6px);
+    }
+
+    .container {
+        text-align: center;
+        position: relative;
+        z-index: 5;
+    }
+
+    /* Sparkles */
+    .sparkle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 0 8px white;
+        animation: floatSparkle 6s linear infinite;
+        z-index: 2;
+    }
+
+    @keyframes floatSparkle {
+        0% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(-800px) scale(0.5); opacity: 0; }
+    }
+
+    /* Falling petals */
+    .petal {
+        position: absolute;
+        width: 18px;
+        height: 26px;
+        background: #d6002f;
+        border-radius: 60% 40% 60% 40%;
+        opacity: 0.9;
+        animation: fallPetal linear forwards;
+        z-index: 2;
+    }
+
+    .petal.rose {
+        background: none;
+        font-size: 22px;
+    }
+
+    @keyframes fallPetal {
+        0% { transform: translateY(-40px) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(110vh) rotate(220deg); opacity: 0; }
+    }
+
+    /* Envelope */
+    .envelope-wrapper {
+        cursor: pointer;
+        display: inline-block;
+        animation: float 2.5s ease-in-out infinite;
+        transition: opacity 0.4s ease;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+
+    .envelope {
+        width: 260px;
+        height: 180px;
+        background: #ffc1d9;
+        border-radius: 12px;
+        position: relative;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+
+    .envelope::before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #ff9ec4, #ff6b81);
+        clip-path: polygon(0 0, 100% 0, 50% 60%);
+    }
+
+    .envelope::after {
+        content: "";
+        position: absolute;
+        width: 70px;
+        height: 70px;
+        background: #ff4b7a;
+        border-radius: 50%;
+        border: 4px solid #ffe4f0;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -10%);
+    }
+
+    .envelope-heart {
+        position: absolute;
+        top: 52%;
+        left: 50%;
+        transform: translate(-50%, -20%);
+        font-size: 32px;
+        color: #ffeef6;
+    }
+
+    .open-hint {
+        margin-top: 18px;
+        font-size: 1rem;
+        color: #4b1b2f;
+        transition: opacity 0.4s ease;
+    }
+
+    /* Note */
+    .note {
+        position: absolute;
+        width: 300px;
+        background: #fffaf5;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.6s ease;
+        border: 2px solid rgba(194,24,91,0.4);
+        z-index: 10;
+    }
+
+    .note.visible {
+        opacity: 1;
+        transform: translate(-50%, -55%) scale(1);
+        pointer-events: auto;
+    }
+
+    /* Rose corners */
+    .note::before,
+    .note::after {
+        content: "🌹";
+        position: absolute;
+        font-size: 20px;
+    }
+
+    .note::before { top: 6px; left: 8px; }
+    .note::after { bottom: 6px; right: 8px; }
+
+    .note-title {
+        font-size: 1.4rem;
+        margin-bottom: 16px;
+        color: #c2185b;
+    }
+
+    .buttons {
+        margin-top: 18px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    button {
+        padding: 10px 26px;
+        font-size: 1rem;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+    }
+
+    #yesBtn {
+        background: linear-gradient(135deg, #ff4b7a, #ff8ba7);
+        color: white;
+    }
+
+    #noBtn {
+        background: white;
+        color: #ff4b7a;
+    }
+
+    /* Bouquet */
+    .bouquet {
+        position: absolute;
+        bottom: -200px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 4rem;
+        opacity: 0;
+        transition: all 1s ease-out;
+        z-index: 10;
+    }
+
+    .bouquet.visible {
+        bottom: 40px;
+        opacity: 1;
+    }
+
+    .bouquet.fade-out {
+        bottom: 200px;
+        opacity: 0;
+    }
+
+    .final-message {
+        margin-top: 18px;
+        font-size: 1.1rem;
+        color: #b0124a;
+        opacity: 0;
+        transition: all 0.7s ease-out;
+    }
+
+    .final-message.visible {
+        opacity: 1;
+    }
+
+    .poem {
+        margin-top: 10px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: #5a1f35;
+        white-space: pre-line;
+    }
+</style>
+</head>
+<body>
+
+<div class="rose-bg"></div>
+
+<!-- Sounds -->
+<audio id="pianoIntro" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5e8b8b0c8d.mp3?filename=romantic-piano-110397.mp3"></audio>
+<audio id="sparkleSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7b2b8b0c8d.mp3?filename=magic-sparkle-110397.mp3"></audio>
+<audio id="yesChime" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0d8b8b0c8d.mp3?filename=magic-chime-110397.mp3"></audio>
+<audio id="noSlip" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_3b2b8b0c8d.mp3?filename=cartoon-slip-110397.mp3"></audio>
+
+<div class="container">
+    <div class="envelope-wrapper" id="envelopeWrapper">
+        <div class="envelope"></div>
+        <div class="envelope-heart">💌</div>
+    </div>
+    <div class="open-hint">Tap the envelope to open your surprise</div>
+
+    <div class="note" id="note">
+        <div class="note-title">Rebeka, will you be my Valentine?</div>
+        <div class="buttons">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+        <div class="final-message" id="finalMessage">
+            I ❤️ you so much Mama and hope to celebrate more Valentines to come.
+            <div class="poem">
+You are my calm, my sweetest light,
+The warmth that makes the hard days bright.
+With every laugh and every touch,
+You show me love that means so much.
+
+If time could pause, I’d hold you near,
+And whisper softly in your ear:
+No matter where our lives may go,
+My heart is yours — I hope you know.
+            </div>
+        </div>
+    </div>
+
+    <div class="bouquet" id="bouquet">💐</div>
+</div>
+
+<script>
+    const envelopeWrapper = document.getElementById("envelopeWrapper");
+    const note = document.getElementById("note");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const bouquet = document.getElementById("bouquet");
+    const finalMessage = document.getElementById("finalMessage");
+
+    const pianoIntro = document.getElementById("pianoIntro");
+    const sparkleSound = document.getElementById("sparkleSound");
+    const yesChime = document.getElementById("yesChime");
+    const noSlip = document.getElementById("noSlip");
+
+    let audioPrimed = false;
+
+    /* Sparkles + petals */
+    function createSparkles() {
+        for (let i = 0; i < 4; i++) {
+            const s = document.createElement("div");
+            s.classList.add("sparkle");
+            s.style.left = Math.random() * window.innerWidth + "px";
+            s.style.bottom = "-10px";
+            s.style.animationDuration = (4 + Math.random() * 4) + "s";
+            document.body.appendChild(s);
+            setTimeout(() => s.remove(), 8000);
+        }
+    }
+
+    function createPetals() {
+        const p = document.createElement("div");
+        const isRose = Math.random() < 0.25;
+        p.classList.add("petal");
+        if (isRose) {
+            p.classList.add("rose");
+            p.textContent = "🌹";
+        }
+        p.style.left = Math.random() * window.innerWidth + "px";
+        const duration = 6 + Math.random() * 4;
+        p.style.animationDuration = duration + "s";
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), duration * 1000);
+    }
+
+    setInterval(createSparkles, 900);
+    setInterval(createPetals, 1200);
+
+    /* Envelope click */
+    envelopeWrapper.addEventListener("click", () => {
+        if (!audioPrimed) {
+            audioPrimed = true;
+            pianoIntro.volume = 0.7;
+            sparkleSound.volume = 1;
+            yesChime.volume = 1;
+            noSlip.volume = 1;
+            pianoIntro.play().catch(() => {});
+        }
+
+        sparkleSound.play().catch(() => {});
+
+        envelopeWrapper.style.opacity = "0";
+        document.querySelector(".open-hint").style.opacity = "0";
+
+        setTimeout(() => {
+            note.classList.add("visible");
+        }, 300);
+    });
+
+    /* No button runs away */
+    document.addEventListener("mousemove", (e) => {
+        if (!note.classList.contains("visible")) return;
+        const rect = noBtn.getBoundingClientRect();
+        const distance = Math.hypot(
+            e.clientX - (rect.left + rect.width / 2),
+            e.clientY - (rect.top + rect.height / 2)
+        );
+        if (distance < 120) {
+            noSlip.play().catch(() => {});
+            const offsetX = (Math.random() - 0.5) * 220;
+            const offsetY = (Math.random() - 0.5) * 140;
+            noBtn.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        }
+    });
+
+    /* Yes button */
+    yesBtn.addEventListener("click", () => {
+        yesChime.play().catch(() => {});
+
+        setTimeout(() => {
+            bouquet.classList.add("visible");
+            finalMessage.classList.add("visible");
+
+            setTimeout(() => {
+                bouquet.classList.add("fade-out");
+            }, 3000);
+        }, 400);
+    });
+</script>
+
+</body>
+</html>
+
+
+
